@@ -1,0 +1,164 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>To-Do List</title>
+
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+        }
+        
+        header {
+            text-align: left;
+            margin-bottom: 20px;
+        }
+        
+        .task-form {
+            margin-bottom: 20px;
+        }
+        
+        .action-btn {
+            text-align: left;
+        }
+        
+        label {
+            display: block;
+            margin: 10px 0 5px;
+        }
+        
+        input[type="text"],
+        input[type="date"] {
+            width: 30%;
+            padding: 10px;
+            margin-bottom: 10px;
+            border: 1px solid rgb(143, 24, 105);
+            border-radius: 4px;
+        }
+        
+        .task-list {
+            list-style-type: none;
+            padding: 0;
+        }
+        
+        .task-list li {
+            background-color: #f9f9f9;
+            margin: 10px 0;
+            padding: 15px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+        }
+        
+        .action-btn {
+            background-color: #007BFF;
+            color: white;
+            padding: 10px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            margin-right: 5px;
+        }
+        
+        .action-btn.update-btn {
+            background-color: #28a745;
+        }
+    </style>
+</head>
+
+<body>
+
+    <header>
+        <img src="1Stop_Orange.png" alt="logo" class="header" width="150" height="100">
+
+    </header>
+
+    <form class="task-form" id="taskForm">
+        <label for="task">Task/Description:</label>
+        <input type="text" id="task" name="task" required>
+
+        <label for="responsible">Responsible:</label>
+        <input type="text" id="responsible" name="responsible" required>
+
+        <label for="eta">ETA:</label>
+        <input type="date" id="eta" name="eta" required>
+
+        <button type="button" class="action-btn" id="submitBtn" onclick="addOrUpdateTask()">Add Task</button>
+    </form>
+
+    <ul class="task-list" id="taskList"></ul>
+
+    <script>
+        let editMode = false;
+        let taskToEdit = null;
+
+        function addOrUpdateTask() {
+            const task = document.getElementById("task").value;
+            const responsible = document.getElementById("responsible").value;
+            const eta = document.getElementById("eta").value;
+
+            if (!task || !responsible || !eta) {
+                alert("Please fill out all fields!");
+                return;
+            }
+
+            if (editMode) {
+                // Update the existing task
+                taskToEdit.querySelector('span:nth-child(1)').innerText = task;
+                taskToEdit.querySelector('span:nth-child(3)').innerText = responsible;
+                taskToEdit.querySelector('span:nth-child(5)').innerText = eta;
+
+                // Reset the form and buttons
+                document.getElementById("submitBtn").innerText = "Add Task";
+                document.getElementById("submitBtn").classList.remove("update-btn");
+                editMode = false;
+                taskToEdit = null;
+            } else {
+                // Create new task
+                const taskList = document.getElementById("taskList");
+                const taskItem = document.createElement("li");
+
+                taskItem.innerHTML = `<strong>Task:</strong> <span>${task}</span> <br>
+                                      <strong>Responsible:</strong> <span>${responsible}</span> <br>
+                                      <strong>ETA:</strong> <span>${eta}</span> <br>
+                                      <button class="action-btn" onclick="editTask(this)">Edit</button>
+                                      <button class="action-btn" onclick="removeTask(this)">Remove</button>`;
+
+                taskList.appendChild(taskItem);
+            }
+
+            // Clear form inputs
+            document.getElementById("taskForm").reset();
+        }
+
+        function editTask(button) {
+            const taskItem = button.parentNode;
+
+            const task = taskItem.querySelector('span:nth-child(1)').innerText;
+            const responsible = taskItem.querySelector('span:nth-child(3)').innerText;
+            const eta = taskItem.querySelector('span:nth-child(5)').innerText;
+
+            // Fill the form with current task details
+            document.getElementById("task").value = task;
+            document.getElementById("responsible").value = responsible;
+            document.getElementById("eta").value = eta;
+
+            // Change the button text to "Update Task"
+            document.getElementById("submitBtn").innerText = "Update Task";
+            document.getElementById("submitBtn").classList.add("update-btn");
+
+            // Set the global state to edit mode
+            editMode = true;
+            taskToEdit = taskItem;
+        }
+
+        function removeTask(button) {
+            const taskItem = button.parentNode;
+            taskItem.remove();
+        }
+    </script>
+</body>
+
+</html>
